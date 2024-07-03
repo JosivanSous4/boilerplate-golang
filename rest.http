@@ -1,0 +1,16 @@
+@devBaseURL = http://localhost:8080
+@host = {{devBaseURL}}
+
+POST {{host}}/products HTTP/1.1
+content-type: application/json
+
+{
+    "id": "10",
+    "name": "Primeiro",
+    "description": "asdasdasd",
+    "price": 50
+}
+
+###
+GET {{host}}/products/9 HTTP/1.1
+content-type: application/json

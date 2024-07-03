@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+    environment:
+      - ENVIRONMENT=local
+      - MYSQL_DSN=root:password@tcp(mysql:3306)/dbname
+      - MONGODB_URI=mongodb://mongo:27017
+      - RABBITMQ_URI=amqp://user:your_password@rabbitmq:5672/
+      - MESSAGING_URI=https://localhost.localstack.cloud:4566/000000000000/product_queue
+      - AWS_ENDPOINT=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=wconnect
+      - AWS_SECRET_ACCESS_KEY=wconnect
+      - AWS_DEFAULT_REGION=us-east-1
+
+      - JWT_SECRET=mysecret
+    volumes:
+      - .:/app
+    depends_on:
+      - mysql
+      - mongo
+      - localstack
+    ports:
+      - "8080:8080"
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    environment:
+      - SERVICES=sqs
+      - DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=wconnect
+      - AWS_SECRET_ACCESS_KEY=wconnect
+    ports:
+      - "4566:4566"
+      - "9324:9324"
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: dbname
+    ports:
+      - "3306:3306"
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   volumes:
+  #     - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+  #     - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: "user"
+  #     RABBITMQ_DEFAULT_PASS: "your_password"
+  #     RABBITMQ_DEFINITIONS_FILE: "/etc/rabbitmq/definitions.json"
